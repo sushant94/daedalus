@@ -8,6 +8,8 @@ import getopt
 import struct
 import sys
 import gmpy
+import os
+from Crypto.PublicKey import RSA
 
 import pyasn1_modules.rfc3447
 import pyasn1.codec.ber.encoder
@@ -16,6 +18,7 @@ from base64 import b64encode
 
 # Local module imports
 from weiner import Weiner
+from rsa_multiple_keys import MultiKey
 
 class RSAKey:
     def __init__(self):
@@ -48,6 +51,8 @@ class RSAKey:
         self.e = eval('0x' + ''.join(['%02X' % struct.unpack('B', x)[0] for x in parts[1]]))
         self.n = eval('0x' + ''.join(['%02X' % struct.unpack('B', x)[0] for x in parts[2]]))
 
+
+
     def MakePrivateKey(self):
         key = pyasn1_modules.rfc3447.RSAPrivateKey()
         dp = self.d % (self.p - 1)
@@ -77,6 +82,25 @@ class RSAKey:
         else:
             print out.encode("ascii")
 
+def parsePEM(arg):
+    f = open(arg, 'r')
+    key64 = f.read()
+    key64.strip
+    keyDER = b64decode(key64)
+    keyPub = RSA.importKey(keyDER)
+    key = RSAKey()
+    key.n = keyPub.n
+    key.e = keyPub.e
+    return key
+
+def multiIn(arg):
+    if not os.path.isdir(arg):
+        return None
+    l = os.listdir(arg)
+    keys = []
+    for i in range(len(l)):
+        keys.append(parsePEM(arg+"/"+l[i]))
+    return keys
 
 help_msg =\
 """
@@ -84,6 +108,7 @@ Welcome to Daedalus v0. Security is very Critical!
 Options:
     -h          Display this help menu
     -i          Input a Public Key file
+    -mi         Multi-In. Used to load a folder of public keys
     -I          Input a Private Key file
     -a          Attack Name to try
     -o          Write results to file (defaults to stdout)
@@ -95,19 +120,26 @@ attacks_help =\
 Available Attacks:
 ------------------------
 * Weiner's attack for small private key exponent (-a weiner)
+* Partial Key Exposure                           (-a partial)
+* Multiple RSA Public Keys                       (-a multipub)
 """
 
-def attack(key, name):
+def attack(key, keys, name):
     if name == "weiner":
         print "Trying Weiner Attack"
         w = Weiner(key)
         w.hack()
         key.MakePrivateKey()
+    if name == "multipub":
+        print "Trying To Break Using Multiple Public Keys"
+        a = MultiKey(keys)
+        a.hack()
 
 def main(argv):
     key = RSAKey()
+    keys = []
     try:
-        opts, args = getopt.getopt(argv, "h:i:I:o:a:l:", [])
+        opts, args = getopt.getopt(argv, "h:i:I:m:o:a:l:", [])
     except getopt.GetoptError:
         print help_msg
         sys.exit(2)
@@ -118,10 +150,14 @@ def main(argv):
             print attacks_help
         if opt == "-i":
             key.ParsePublicKey(arg)
+        if opt == "-m":
+            # Returns an array of parsed keys.
+            keys = multiIn(arg)
+            key = None
         if opt == "-o":
             key.outfile = arg
         if opt == "-a":
-            attack(key, arg)
+            attack(key, keys, arg)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
