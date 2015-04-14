@@ -1,6 +1,5 @@
 # Attacks when we multiple RSA Public keys available
 #   * Attack 1: Same e. Different N. (N_i, N_j) != 1 for some i, j
-#   * Attack 2:
 
 import sys
 import daedmath

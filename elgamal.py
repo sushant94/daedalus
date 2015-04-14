@@ -102,6 +102,7 @@ class Elgamal:
                 break
         if x:
             print "[*] Retrieved Private Key x: %d" % x
+        else:
+            print "[X] Unable to calculate x!"
         
-e = Elgamal("tests/dist/sigs.txt")
-e.hack()
+

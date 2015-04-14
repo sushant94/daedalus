@@ -2,6 +2,7 @@
 # Contributors: Sushant Dinesh [:sushant94]
 #
 
+# Returns an array of upto 10^5 Continued fraction coeffs
 def computeContinuedFractions(a, b):
     cFracs = []
     for i in range(10000):
@@ -53,8 +54,8 @@ def solveLinearCongruence(a, b, c):
     x = x * b
     solns = []
     end = c
-    if c > 100000:
-        end = 1000000000
+    if c > 10000:
+        end = 10000
     for k in range(0,end):
         s = (x + (c * k)) % c
         solns.append(s)

@@ -19,6 +19,7 @@ from base64 import b64encode
 # Local module imports
 from weiner import Weiner
 from rsa_multiple_keys import MultiKey
+from elgamal import Elgamal
 
 class RSAKey:
     def __init__(self):
@@ -38,8 +39,8 @@ class RSAKey:
         self.phin = None
         self.outfile = None
 
-    def ParsePublicKey(self, infile):
-        f = open(infile, 'r')
+    def ParsePublicKey(self):
+        f = open(self.infile, 'r')
         s = f.read()
         f.close()
         parts = []
@@ -120,12 +121,13 @@ attacks_help =\
 Available Attacks:
 ------------------------
 * Weiner's attack for small private key exponent (-a weiner)
-* Partial Key Exposure                           (-a partial)
 * Multiple RSA Public Keys                       (-a multipub)
+* Elgamal (common r)                             (-a elgamal)
 """
 
 def attack(key, keys, name):
     if name == "weiner":
+        key.ParsePublicKey()
         print "Trying Weiner Attack"
         w = Weiner(key)
         w.hack()
@@ -134,12 +136,15 @@ def attack(key, keys, name):
         print "Trying To Break Using Multiple Public Keys"
         a = MultiKey(keys)
         a.hack()
+    if name == "elgamal":
+        e = Elgamal(key.infile)
+        e.hack()
 
 def main(argv):
     key = RSAKey()
     keys = []
     try:
-        opts, args = getopt.getopt(argv, "h:i:I:m:o:a:l:", [])
+        opts, args = getopt.getopt(argv, "h:i:I:m:o:a:l", [])
     except getopt.GetoptError:
         print help_msg
         sys.exit(2)
@@ -149,7 +154,7 @@ def main(argv):
         if opt == "-l":
             print attacks_help
         if opt == "-i":
-            key.ParsePublicKey(arg)
+            key.infile = arg
         if opt == "-m":
             # Returns an array of parsed keys.
             keys = multiIn(arg)
