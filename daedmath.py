@@ -42,6 +42,25 @@ def extendedEuclid(a, b):
         t, t_ = t_ - n * t, t
     return gcd, s, t
 
+def invert(a, b):
+    gcd, x, y = extendedEuclid(a, b)
+    return x
+
+# Linear Congruence is of the form: ax = b mod c
+def solveLinearCongruence(a, b, c):
+    gcd, x, y = extendedEuclid(a, c)
+    y = -1 * y
+    x = x * b
+    solns = []
+    end = c
+    if c > 100000:
+        end = 1000000000
+    for k in range(0,end):
+        s = (x + (c * k)) % c
+        solns.append(s)
+    return list(set(solns))
+
+
 # Test Functions to verify working
 def TcomputeContinuedFractions():
     l = computeContinuedFractions(17993, 90581)
@@ -65,8 +84,18 @@ def TextendedEuclid():
     else:
         print "Test ExtendedEuclid: Failed!"
 
+
+def TsolveLinearCongruence():
+    solns = solveLinearCongruence(9, 15, 23)
+    expected = [17]
+    if expected == solns:
+        print "Test solveLinearCongruence: Passed!"
+    else:
+        print "Test solveLinearCongruence: Failed!"
+
+
 if __name__ == "__main__":
     TcomputeContinuedFractions()
     Teuclid()
     TextendedEuclid()
-
+    TsolveLinearCongruence()

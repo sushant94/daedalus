@@ -14,21 +14,19 @@ class MultiKey:
 
     def hack(self):
         # First Attack: Check if any two keys have (N_i, N_j) != 1
+        print "[*] Factoring of 2 keys using GCD"
+        flag = False
         for i in range(len(self.keys)):
             for j in range(i + 1, len(self.keys)):
                 gcd = daedmath.euclid(self.keys[i].n, self.keys[j].n)
                 if gcd != 1:
-                    self.keys[i].p = gcd
-                    self.keys[i].q = self.keys[i].n / gcd
-                    self.keys[i].phin = self.keys[i].n + 1 - self.keys[i].p - self.keys[i].q
-                    self.keys[i].d = self.keys[i].phin / self.keys[i].e
-                    print self.keys[i].p
-                    print self.keys[i].q
-                    self.keys[i].MakePrivateKey()
-                    self.keys[j].p = gcd
-                    self.keys[j].q = self.keys[j].n / gcd
-                    self.keys[j].phin = self.keys[j].n + 1 - self.keys[j].p - self.keys[j].q
-                    self.keys[j].d = self.keys[j].phin / self.keys[j].e
-                    print self.keys[j].p
-                    print self.keys[j].q
-                    self.keys[j].MakePrivateKey()
+                    flag = True
+                    print " [*] Success"
+                    for k in [i, j]:
+                        self.keys[k].p = gcd
+                        self.keys[k].q = self.keys[k].n / gcd
+                        self.keys[k].phin = self.keys[k].n + 1 - self.keys[k].p - self.keys[k].q
+                        self.keys[k].d = self.keys[k].phin / self.keys[k].e
+                        self.keys[k].MakePrivateKey()
+        if not flag:
+            print "[X] Failed"
