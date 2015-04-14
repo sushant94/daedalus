@@ -4,3 +4,4 @@ Some of the test files used in this framework are not the work of the authors. H
 
 * weiner_vuln_pub.key  - [HackLu 2014](https://wildwildweb.fluxfingers.net/2014) (Weiner)
 * multi_test/*         - [BackdoorCTF 2015](https://backdoor.sdslabs.co) (RSALot)
+* sigs.txt             - [Boston Key Party 2015](http://bostonkey.party/) (Woodland)
